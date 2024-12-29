@@ -31,27 +31,28 @@ def add_pref(t):
     n = len(t.pref)
     for i in range(n):
         for j in range(len(t.alphabet)):
-            new_pref = t.pref[i] + t.alphabet[j] if t.pref[i] != "ε" else t.alphabet[j]
-            if new_pref not in t.pref:
-                t.pref.append(new_pref)
-                t.is_main.append(False)
-                wordlist = []
-                for k in range(len(t.suff)):
-                    suff = t.suff[k]
-                    word = "ε" if new_pref == "ε" and suff == "ε" else (
-                        suff if new_pref == "ε" else (new_pref if suff == "ε" else new_pref + suff))
-                    wordlist.append(word)
-                data = {"wordList": wordlist}
-                response = session.post(f"{ip}/check-word-batch", json=data)
-                temp = []
-                if response.status_code == 200:
-                    parsed_response = response.json()
+            if t.is_main[i]:
+                new_pref = t.pref[i] + t.alphabet[j] if t.pref[i] != "ε" else t.alphabet[j]
+                if new_pref not in t.pref:
+                    t.pref.append(new_pref)
+                    t.is_main.append(False)
+                    wordlist = []
                     for k in range(len(t.suff)):
-                        if parsed_response["responseList"][k] == True:
-                            temp.append(1)
-                        else:
-                            temp.append(0)
-                t.data.append(temp)
+                        suff = t.suff[k]
+                        word = "ε" if new_pref == "ε" and suff == "ε" else (
+                            suff if new_pref == "ε" else (new_pref if suff == "ε" else new_pref + suff))
+                        wordlist.append(word)
+                    data = {"wordList": wordlist}
+                    response = session.post(f"{ip}/check-word-batch", json=data)
+                    temp = []
+                    if response.status_code == 200:
+                        parsed_response = response.json()
+                        for k in range(len(t.suff)):
+                            if parsed_response["responseList"][k] == True:
+                                temp.append(1)
+                            else:
+                                temp.append(0)
+                    t.data.append(temp)
 
 def fill_elem(pref, suff):
     word = "ε" if pref == "ε" and suff == "ε" else (suff if pref == "ε" else (pref if suff == "ε" else pref + suff))
@@ -130,7 +131,7 @@ def main():
     t = Table()
     session.post(f"{ip}/generate", json={
             "mode": "fixed",
-            "size": 4
+            "size": 10
         }
     )
 
