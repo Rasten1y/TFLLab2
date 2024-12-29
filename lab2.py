@@ -130,7 +130,7 @@ def main():
     t = Table()
     session.post(f"{ip}/generate", json={
             "mode": "fixed",
-            "size":3
+            "size": 4
         }
     )
 
